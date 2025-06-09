@@ -107,7 +107,7 @@ MODULE model_configuration
     ! Some pre-processing stuff for reference ice geometry
     REAL(dp)            :: refgeo_Hi_min_config                         = 2.0_dp                           ! [m]             [default: 2.0]     Remove ice thinner than this value in the reference ice geometry. Particularly useful for BedMachine Greenland, which somehow covers the entire tundra with half a meter of ice...
     LOGICAL             :: do_smooth_geometry_config                    = .FALSE.                          ! Whether or not to smooth the reference bedrock
-    REAL(dp)            :: r_smooth_geometry_config                     = 0.5_dp                           ! Geometry smoothing radius (in number of reference grid cells)
+    REAL(dp)            :: r_smooth_geometry_config                     = 0.5_dp                           ! [m]             Geometry smoothing radius
     LOGICAL             :: remove_Lake_Vostok_config                    = .TRUE.                           ! Whether or not to replace subglacial Lake Vostok in Antarctica with ice (recommended to set to TRUE, otherwise it will really slow down your model for the first few hundred years...)
 
 
@@ -487,46 +487,6 @@ MODULE model_configuration
     REAL(dp)            :: Martin2011_hydro_Hb_min_config               = 0._dp                            ! Martin et al. (2011) basal hydrology model: low-end  Hb  value of bedrock-dependent pore-water pressure
     REAL(dp)            :: Martin2011_hydro_Hb_max_config               = 1000._dp                         ! Martin et al. (2011) basal hydrology model: high-end Hb  value of bedrock-dependent pore-water pressure
 
-    ! Initialisation of the pore water fraction
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_NAM_config = 'zero'                       ! How to initialise the pore water fraction: 'zero', 'read_from_file'
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_EAS_config = 'zero'
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_GRL_config = 'zero'
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_ANT_config = 'zero'
-    ! Paths to files containing pore water fraction fields
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_NAM_config      = ''
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_EAS_config      = ''
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_GRL_config      = ''
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_ANT_config      = ''
-    ! Timeframes to read from the pore water fraction file (set to 1E9    if the file has no time dimension)
-    REAL(dp)            :: timeframe_pore_water_fraction_NAM_config     = 1E9_dp                           ! Can be different from C%start_time_of_run, be careful though!
-    REAL(dp)            :: timeframe_pore_water_fraction_EAS_config     = 1E9_dp
-    REAL(dp)            :: timeframe_pore_water_fraction_GRL_config     = 1E9_dp
-    REAL(dp)            :: timeframe_pore_water_fraction_ANT_config     = 1E9_dp
-
-  ! == Basal hydrology inversion by nudging
-  ! =======================================
-
-    ! General
-    LOGICAL             :: do_pore_water_nudging_config                 = .FALSE.                          !           Whether or not to nudge the pore water pressure
-    CHARACTER(LEN=256)  :: choice_pore_water_nudging_method_config      = 'local'                          !           Choice of pore water nudging method: "local", "flowline"
-    REAL(dp)            :: pore_water_nudging_dt_config                 = 5._dp                            ! [yr]      Time step for pore water updates
-    REAL(dp)            :: pore_water_nudging_t_start_config            = -9.9E9_dp                        ! [yr]      Earliest model time when nudging is allowed
-    REAL(dp)            :: pore_water_nudging_t_end_config              = +9.9E9_dp                        ! [yr]      Latest   model time when nudging is allowed
-    REAL(dp)            :: pore_water_fraction_min_config               = 0._dp                            ! [?]       Smallest allowed value for the first  inverted pore water pressure field
-    REAL(dp)            :: pore_water_fraction_max_config               = 0.9999_dp                        ! [?]       Largest  allowed value for the first  inverted pore water pressure field
-    CHARACTER(LEN=256)  :: filename_inverted_pore_water_config          = 'pore_water_inv.nc'              !           NetCDF file where the final inverted pore water fields will be saved
-
-    ! Basal hydrology inversion model based on local and flowline-averaged values of H and dH/dt
-    REAL(dp)            :: porenudge_H_dHdt_flowline_t_scale_config     = 150._dp                          ! [yr]      Timescale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dH0_config         = 200._dp                          ! [m]       Ice thickness error scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dHdt0_config       = 0.7_dp                           ! [m yr^-1] Thinning rate scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dU0_config         = 200._dp                          ! [m yr^-1] Surface speed error scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_Hi_scale_config    = 100._dp                          ! [m]       Ice thickness weight scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_u_scale_config     = 1000._dp                         ! [m yr^-1] Ice velocity  weight scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_r_smooth_config    = 5000._dp                         ! [m]       Radius for Gaussian filter used to smooth dC/dt as regularisation
-    REAL(dp)            :: porenudge_H_dHdt_flowline_w_smooth_config    = 0.0_dp                           ! [-]       Relative contribution of smoothed dC/dt in regularisation
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dist_max_config    = 1000.0_dp                        ! [km]      Max total distance the trace is allowed to move before ending it
-
   ! == Bed roughness
   ! ==================
 
@@ -820,7 +780,9 @@ MODULE model_configuration
   ! ===============
 
     ! Output
-    LOGICAL             :: do_write_laddie_output_config                = .FALSE.                          ! Whether or not to write output on laddie time
+    LOGICAL             :: do_write_laddie_output_fields_config         = .FALSE.                          ! Whether or not to write output fields on laddie time
+    LOGICAL             :: do_write_laddie_output_scalar_config         = .FALSE.                          ! Whether or not to write output scalars on laddie time
+    REAL(dp)            :: time_interval_scalar_output_config           = 1._dp                            ! [days] Time interval at which to write out buffered scalars
 
     ! Time step
     REAL(dp)            :: dt_laddie_config                             = 360._dp                          ! [s] Time step for integration of laddie model
@@ -828,10 +790,11 @@ MODULE model_configuration
     REAL(dp)            :: time_duration_laddie_init_config             = 30._dp                           ! [days] Duration of initial run cycle
 
     ! Integration
-    CHARACTER(LEN=256)  :: choice_laddie_integration_scheme_config      = ''                               ! Choose integration scheme. Options: 'euler', 'fbrk3'
+    CHARACTER(LEN=256)  :: choice_laddie_integration_scheme_config      = ''                               ! Choose integration scheme. Options: 'euler', 'fbrk3', 'lfra'
     REAL(dp)            :: laddie_fbrk3_beta1_config                    = 0.0_dp                           ! [] beta1 factor in FBRK3 integration. Must be between 0 and 1
     REAL(dp)            :: laddie_fbrk3_beta2_config                    = 0.0_dp                           ! [] beta2 factor in FBRK3 integration. Must be between 0 and 1
     REAL(dp)            :: laddie_fbrk3_beta3_config                    = 0.0_dp                           ! [] beta3 factor in FBRK3 integration. Must be between 0 and 1
+    REAL(dp)            :: laddie_lfra_nu_config                        = 0.1_dp                           ! [] nu factor in LFRA integration. Must be between 0 and 1
 
     ! Momentum advection
     CHARACTER(LEN=256)  :: choice_laddie_momentum_advection_config      = ''                               ! Choose momentum advection scheme. Options: 'none', 'upstream'
@@ -1510,46 +1473,6 @@ MODULE model_configuration
     REAL(dp)            :: Martin2011_hydro_Hb_min
     REAL(dp)            :: Martin2011_hydro_Hb_max
 
-    ! Initialisation of the pore water fraction
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_NAM
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_EAS
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_GRL
-    CHARACTER(LEN=256)  :: pore_water_fraction_choice_initialise_ANT
-    ! Paths to files containing pore water fraction fields
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_NAM
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_EAS
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_GRL
-    CHARACTER(LEN=256)  :: filename_pore_water_fraction_ANT
-    ! Timeframes to read from the pore water fraction file (set to 1E9    if the file has no time dimension)
-    REAL(dp)            :: timeframe_pore_water_fraction_NAM
-    REAL(dp)            :: timeframe_pore_water_fraction_EAS
-    REAL(dp)            :: timeframe_pore_water_fraction_GRL
-    REAL(dp)            :: timeframe_pore_water_fraction_ANT
-
-  ! == Basal hydrology inversion by nudging
-  ! =======================================
-
-    ! General
-    LOGICAL             :: do_pore_water_nudging
-    CHARACTER(LEN=256)  :: choice_pore_water_nudging_method
-    REAL(dp)            :: pore_water_nudging_dt
-    REAL(dp)            :: pore_water_nudging_t_start
-    REAL(dp)            :: pore_water_nudging_t_end
-    REAL(dp)            :: pore_water_fraction_min
-    REAL(dp)            :: pore_water_fraction_max
-    CHARACTER(LEN=256)  :: filename_inverted_pore_water
-
-    ! Basal hydrology inversion model based on local and flowline-averaged values of H and dH/dt
-    REAL(dp)            :: porenudge_H_dHdt_flowline_t_scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dH0
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dHdt0
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dU0
-    REAL(dp)            :: porenudge_H_dHdt_flowline_Hi_scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_u_scale
-    REAL(dp)            :: porenudge_H_dHdt_flowline_r_smooth
-    REAL(dp)            :: porenudge_H_dHdt_flowline_w_smooth
-    REAL(dp)            :: porenudge_H_dHdt_flowline_dist_max
-
   ! == Bed roughness
   ! ==================
 
@@ -1843,7 +1766,9 @@ MODULE model_configuration
   ! ===============
 
     ! Output
-    LOGICAL             :: do_write_laddie_output
+    LOGICAL             :: do_write_laddie_output_fields
+    LOGICAL             :: do_write_laddie_output_scalar
+    REAL(dp)            :: time_interval_scalar_output
 
     ! Time step
     REAL(dp)            :: dt_laddie
@@ -1855,6 +1780,7 @@ MODULE model_configuration
     REAL(dp)            :: laddie_fbrk3_beta1
     REAL(dp)            :: laddie_fbrk3_beta2
     REAL(dp)            :: laddie_fbrk3_beta3
+    REAL(dp)            :: laddie_lfra_nu
 
     ! Momentum advection
     CHARACTER(LEN=256)  :: choice_laddie_momentum_advection
@@ -2588,35 +2514,6 @@ CONTAINS
       choice_basal_hydrology_model_config                         , &
       Martin2011_hydro_Hb_min_config                              , &
       Martin2011_hydro_Hb_max_config                              , &
-      pore_water_fraction_choice_initialise_NAM_config            , &
-      pore_water_fraction_choice_initialise_EAS_config            , &
-      pore_water_fraction_choice_initialise_GRL_config            , &
-      pore_water_fraction_choice_initialise_ANT_config            , &
-      filename_pore_water_fraction_NAM_config                     , &
-      filename_pore_water_fraction_EAS_config                     , &
-      filename_pore_water_fraction_GRL_config                     , &
-      filename_pore_water_fraction_ANT_config                     , &
-      timeframe_pore_water_fraction_NAM_config                    , &
-      timeframe_pore_water_fraction_EAS_config                    , &
-      timeframe_pore_water_fraction_GRL_config                    , &
-      timeframe_pore_water_fraction_ANT_config                    , &
-      do_pore_water_nudging_config                                , &
-      choice_pore_water_nudging_method_config                     , &
-      pore_water_nudging_dt_config                                , &
-      pore_water_nudging_t_start_config                           , &
-      pore_water_nudging_t_end_config                             , &
-      pore_water_fraction_min_config                              , &
-      pore_water_fraction_max_config                              , &
-      filename_inverted_pore_water_config                         , &
-      porenudge_H_dHdt_flowline_t_scale_config                    , &
-      porenudge_H_dHdt_flowline_dH0_config                        , &
-      porenudge_H_dHdt_flowline_dHdt0_config                      , &
-      porenudge_H_dHdt_flowline_dU0_config                        , &
-      porenudge_H_dHdt_flowline_Hi_scale_config                   , &
-      porenudge_H_dHdt_flowline_u_scale_config                    , &
-      porenudge_H_dHdt_flowline_r_smooth_config                   , &
-      porenudge_H_dHdt_flowline_w_smooth_config                   , &
-      porenudge_H_dHdt_flowline_dist_max_config                   , &
       choice_bed_roughness_config                                 , &
       choice_bed_roughness_parameterised_config                   , &
       filename_bed_roughness_NAM_config                           , &
@@ -2787,7 +2684,9 @@ CONTAINS
       filename_BMB_laddie_initial_output_config                   , &
       dir_BMB_laddie_model_config                                 , &
       conda_activate_prompt_config                                , &
-      do_write_laddie_output_config                               , &
+      do_write_laddie_output_fields_config                        , &
+      do_write_laddie_output_scalar_config                        , &
+      time_interval_scalar_output_config                          , &
       dt_laddie_config                                            , &
       time_duration_laddie_config                                 , &
       time_duration_laddie_init_config                            , &
@@ -2795,6 +2694,7 @@ CONTAINS
       laddie_fbrk3_beta1_config                                   , &
       laddie_fbrk3_beta2_config                                   , &
       laddie_fbrk3_beta3_config                                   , &
+      laddie_lfra_nu_config                                       , &
       choice_laddie_momentum_advection_config                     , &
       laddie_initial_thickness_config                             , &
       laddie_initial_T_offset_config                              , &
@@ -3444,46 +3344,6 @@ CONTAINS
     C%Martin2011_hydro_Hb_min                                = Martin2011_hydro_Hb_min_config
     C%Martin2011_hydro_Hb_max                                = Martin2011_hydro_Hb_max_config
 
-    ! Initialisation of the pore water fraction
-    C%pore_water_fraction_choice_initialise_NAM              = pore_water_fraction_choice_initialise_NAM_config
-    C%pore_water_fraction_choice_initialise_EAS              = pore_water_fraction_choice_initialise_EAS_config
-    C%pore_water_fraction_choice_initialise_GRL              = pore_water_fraction_choice_initialise_GRL_config
-    C%pore_water_fraction_choice_initialise_ANT              = pore_water_fraction_choice_initialise_ANT_config
-    ! Paths to files containing pore water fraction fields
-    C%filename_pore_water_fraction_NAM                       = filename_pore_water_fraction_NAM_config
-    C%filename_pore_water_fraction_EAS                       = filename_pore_water_fraction_EAS_config
-    C%filename_pore_water_fraction_GRL                       = filename_pore_water_fraction_GRL_config
-    C%filename_pore_water_fraction_ANT                       = filename_pore_water_fraction_ANT_config
-    ! Timeframes to read from the pore water fraction file (set to 1E9    if the file has no time dimension)
-    C%timeframe_pore_water_fraction_NAM                      = timeframe_pore_water_fraction_NAM_config
-    C%timeframe_pore_water_fraction_EAS                      = timeframe_pore_water_fraction_EAS_config
-    C%timeframe_pore_water_fraction_GRL                      = timeframe_pore_water_fraction_GRL_config
-    C%timeframe_pore_water_fraction_ANT                      = timeframe_pore_water_fraction_ANT_config
-
-  ! == Basal hydrology inversion by nudging
-  ! =======================================
-
-    ! General
-    C%do_pore_water_nudging                                  = do_pore_water_nudging_config
-    C%choice_pore_water_nudging_method                       = choice_pore_water_nudging_method_config
-    C%pore_water_nudging_dt                                  = pore_water_nudging_dt_config
-    C%pore_water_nudging_t_start                             = pore_water_nudging_t_start_config
-    C%pore_water_nudging_t_end                               = pore_water_nudging_t_end_config
-    C%pore_water_fraction_min                                = pore_water_fraction_min_config
-    C%pore_water_fraction_max                                = pore_water_fraction_max_config
-    C%filename_inverted_pore_water                           = filename_inverted_pore_water_config
-
-    ! Basal hydrology inversion model based on local and flowline-averaged values of H and dH/dt
-    C%porenudge_H_dHdt_flowline_t_scale                      = porenudge_H_dHdt_flowline_t_scale_config
-    C%porenudge_H_dHdt_flowline_dH0                          = porenudge_H_dHdt_flowline_dH0_config
-    C%porenudge_H_dHdt_flowline_dHdt0                        = porenudge_H_dHdt_flowline_dHdt0_config
-    C%porenudge_H_dHdt_flowline_dU0                          = porenudge_H_dHdt_flowline_dU0_config
-    C%porenudge_H_dHdt_flowline_Hi_scale                     = porenudge_H_dHdt_flowline_Hi_scale_config
-    C%porenudge_H_dHdt_flowline_u_scale                      = porenudge_H_dHdt_flowline_u_scale_config
-    C%porenudge_H_dHdt_flowline_r_smooth                     = porenudge_H_dHdt_flowline_r_smooth_config
-    C%porenudge_H_dHdt_flowline_w_smooth                     = porenudge_H_dHdt_flowline_w_smooth_config
-    C%porenudge_H_dHdt_flowline_dist_max                     = porenudge_H_dHdt_flowline_dist_max_config
-
   ! == Bed roughness
   ! ==================
 
@@ -3777,8 +3637,9 @@ CONTAINS
   ! ===============
 
     ! Output
-    C%do_write_laddie_output                                 = do_write_laddie_output_config
-
+    C%do_write_laddie_output_fields                          = do_write_laddie_output_fields_config
+    C%do_write_laddie_output_scalar                          = do_write_laddie_output_scalar_config
+    C%time_interval_scalar_output                            = time_interval_scalar_output_config
     ! Time step
     C%dt_laddie                                              = dt_laddie_config
     C%time_duration_laddie                                   = time_duration_laddie_config
@@ -3789,6 +3650,7 @@ CONTAINS
     C%laddie_fbrk3_beta1                                     = laddie_fbrk3_beta1_config
     C%laddie_fbrk3_beta2                                     = laddie_fbrk3_beta2_config
     C%laddie_fbrk3_beta3                                     = laddie_fbrk3_beta3_config
+    C%laddie_lfra_nu                                         = laddie_lfra_nu_config
 
     ! Momentum advection
     C%choice_laddie_momentum_advection                       = choice_laddie_momentum_advection_config
