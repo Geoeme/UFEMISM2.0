@@ -379,21 +379,6 @@ MODULE model_configuration
     REAL(dp)            :: timeframe_dHi_dt_target_GRL_config           = 1E9_dp
     REAL(dp)            :: timeframe_dHi_dt_target_ANT_config           = 1E9_dp
 
-    ! Target surface ice speed
-    LOGICAL             :: do_target_uabs_surf_config                   = .FALSE.                          ! Whether or not to use a target uabs_surf field from an external file as a target during inversions
-
-    ! Files containing a target uabs_surf for inversions
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_NAM_config         = ''
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_EAS_config         = ''
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_GRL_config         = ''
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_ANT_config         = ''
-
-    ! Timeframes for reading target uabs_surf from file (set to 1E9_dp if the file has no time dimension)
-    REAL(dp)            :: timeframe_uabs_surf_target_NAM_config        = 1E9_dp
-    REAL(dp)            :: timeframe_uabs_surf_target_EAS_config        = 1E9_dp
-    REAL(dp)            :: timeframe_uabs_surf_target_GRL_config        = 1E9_dp
-    REAL(dp)            :: timeframe_uabs_surf_target_ANT_config        = 1E9_dp
-
   ! == Ice dynamics - time stepping
   ! ===============================
 
@@ -527,13 +512,10 @@ MODULE model_configuration
     REAL(dp)            :: bed_roughness_nudging_dt_config              = 5._dp                            ! [yr]      Time step for bed roughness updates
     REAL(dp)            :: bed_roughness_nudging_t_start_config         = -9.9E9_dp                        ! [yr]      Earliest model time when nudging is allowed
     REAL(dp)            :: bed_roughness_nudging_t_end_config           = +9.9E9_dp                        ! [yr]      Latest   model time when nudging is allowed
-    REAL(dp)            :: generic_bed_roughness_1_min_config           = 0.1_dp                           ! [?]       Smallest allowed value for the first  inverted bed roughness field
-    REAL(dp)            :: generic_bed_roughness_1_max_config           = 30._dp                           ! [?]       Largest  allowed value for the first  inverted bed roughness field
-    REAL(dp)            :: generic_bed_roughness_2_min_config           = 0.1_dp                           ! [?]       Smallest allowed value for the second inverted bed roughness field
-    REAL(dp)            :: generic_bed_roughness_2_max_config           = 30._dp                           ! [?]       Largest  allowed value for the second inverted bed roughness field
-    CHARACTER(LEN=256)  :: filename_inverted_bed_roughness_config       = 'bed_roughness_inv.nc'           !           NetCDF file where the final inverted bed roughness fields will be saved
+    REAL(dp)            :: generic_bed_roughness_min_config             = 0.1_dp                           ! [?]       Smallest allowed value for the first  inverted bed roughness field
+    REAL(dp)            :: generic_bed_roughness_max_config             = 30._dp                           ! [?]       Largest  allowed value for the first  inverted bed roughness field
 
-    ! Basal inversion model based on flowline-averaged values of H and dH/dt
+    ! Bed roughness nudging model based on flowline-averaged values of H and dH/dt
     REAL(dp)            :: bednudge_H_dHdt_flowline_t_scale_config      = 100._dp                          ! [yr]      Timescale
     REAL(dp)            :: bednudge_H_dHdt_flowline_dH0_config          = 100._dp                          ! [m]       Ice thickness error scale
     REAL(dp)            :: bednudge_H_dHdt_flowline_dHdt0_config        = 0.6_dp                           ! [m yr^-1] Thinning rate scale
@@ -1365,21 +1347,6 @@ MODULE model_configuration
     REAL(dp)            :: timeframe_dHi_dt_target_GRL
     REAL(dp)            :: timeframe_dHi_dt_target_ANT
 
-    ! Target surface ice speed
-    LOGICAL             :: do_target_uabs_surf
-
-    ! Files containing a target uabs_surf for inversions
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_NAM
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_EAS
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_GRL
-    CHARACTER(LEN=256)  :: filename_uabs_surf_target_ANT
-
-    ! Timeframes for reading target uabs_surf from file (set to 1E9_dp if the file has no time dimension)
-    REAL(dp)            :: timeframe_uabs_surf_target_NAM
-    REAL(dp)            :: timeframe_uabs_surf_target_EAS
-    REAL(dp)            :: timeframe_uabs_surf_target_GRL
-    REAL(dp)            :: timeframe_uabs_surf_target_ANT
-
   ! == Ice dynamics - time stepping
   ! ===============================
 
@@ -1513,13 +1480,10 @@ MODULE model_configuration
     REAL(dp)            :: bed_roughness_nudging_dt
     REAL(dp)            :: bed_roughness_nudging_t_start
     REAL(dp)            :: bed_roughness_nudging_t_end
-    REAL(dp)            :: generic_bed_roughness_1_min
-    REAL(dp)            :: generic_bed_roughness_1_max
-    REAL(dp)            :: generic_bed_roughness_2_min
-    REAL(dp)            :: generic_bed_roughness_2_max
-    CHARACTER(LEN=256)  :: filename_inverted_bed_roughness
+    REAL(dp)            :: generic_bed_roughness_min
+    REAL(dp)            :: generic_bed_roughness_max
 
-    ! Basal inversion model based on flowline-averaged values of H and dH/dt
+    ! Bed roughness nudging model based on flowline-averaged values of H and dH/dt
     REAL(dp)            :: bednudge_H_dHdt_flowline_t_scale
     REAL(dp)            :: bednudge_H_dHdt_flowline_dH0
     REAL(dp)            :: bednudge_H_dHdt_flowline_dHdt0
@@ -2445,15 +2409,6 @@ CONTAINS
       timeframe_dHi_dt_target_EAS_config                          , &
       timeframe_dHi_dt_target_GRL_config                          , &
       timeframe_dHi_dt_target_ANT_config                          , &
-      do_target_uabs_surf_config                                  , &
-      filename_uabs_surf_target_NAM_config                        , &
-      filename_uabs_surf_target_EAS_config                        , &
-      filename_uabs_surf_target_GRL_config                        , &
-      filename_uabs_surf_target_ANT_config                        , &
-      timeframe_uabs_surf_target_NAM_config                       , &
-      timeframe_uabs_surf_target_EAS_config                       , &
-      timeframe_uabs_surf_target_GRL_config                       , &
-      timeframe_uabs_surf_target_ANT_config                       , &
       choice_timestepping_config                                  , &
       dt_ice_max_config                                           , &
       dt_ice_min_config                                           , &
@@ -2542,11 +2497,8 @@ CONTAINS
       bed_roughness_nudging_dt_config                             , &
       bed_roughness_nudging_t_start_config                        , &
       bed_roughness_nudging_t_end_config                          , &
-      generic_bed_roughness_1_min_config                          , &
-      generic_bed_roughness_1_max_config                          , &
-      generic_bed_roughness_2_min_config                          , &
-      generic_bed_roughness_2_max_config                          , &
-      filename_inverted_bed_roughness_config                      , &
+      generic_bed_roughness_min_config                            , &
+      generic_bed_roughness_max_config                            , &
       bednudge_H_dHdt_flowline_t_scale_config                     , &
       bednudge_H_dHdt_flowline_dH0_config                         , &
       bednudge_H_dHdt_flowline_dHdt0_config                       , &
@@ -3236,21 +3188,6 @@ CONTAINS
     C%timeframe_dHi_dt_target_GRL                            = timeframe_dHi_dt_target_GRL_config
     C%timeframe_dHi_dt_target_ANT                            = timeframe_dHi_dt_target_ANT_config
 
-    ! Target surface ice speed
-    C%do_target_uabs_surf                                    = do_target_uabs_surf_config
-
-    ! Files containing a target uabs_surf for inversions
-    C%filename_uabs_surf_target_NAM                          = filename_uabs_surf_target_NAM_config
-    C%filename_uabs_surf_target_EAS                          = filename_uabs_surf_target_EAS_config
-    C%filename_uabs_surf_target_GRL                          = filename_uabs_surf_target_GRL_config
-    C%filename_uabs_surf_target_ANT                          = filename_uabs_surf_target_ANT_config
-
-    ! Timeframes for reading target uabs_surf from file (set to 1E9_dp if the file has no time dimension)
-    C%timeframe_uabs_surf_target_NAM                         = timeframe_uabs_surf_target_NAM_config
-    C%timeframe_uabs_surf_target_EAS                         = timeframe_uabs_surf_target_EAS_config
-    C%timeframe_uabs_surf_target_GRL                         = timeframe_uabs_surf_target_GRL_config
-    C%timeframe_uabs_surf_target_ANT                         = timeframe_uabs_surf_target_ANT_config
-
   ! == Ice dynamics - time stepping
   ! ===============================
 
@@ -3384,13 +3321,10 @@ CONTAINS
     C%bed_roughness_nudging_dt                               = bed_roughness_nudging_dt_config
     C%bed_roughness_nudging_t_start                          = bed_roughness_nudging_t_start_config
     C%bed_roughness_nudging_t_end                            = bed_roughness_nudging_t_end_config
-    C%generic_bed_roughness_1_min                            = generic_bed_roughness_1_min_config
-    C%generic_bed_roughness_1_max                            = generic_bed_roughness_1_max_config
-    C%generic_bed_roughness_2_min                            = generic_bed_roughness_2_min_config
-    C%generic_bed_roughness_2_max                            = generic_bed_roughness_2_max_config
-    C%filename_inverted_bed_roughness                        = filename_inverted_bed_roughness_config
+    C%generic_bed_roughness_min                              = generic_bed_roughness_min_config
+    C%generic_bed_roughness_max                              = generic_bed_roughness_max_config
 
-    ! Basal inversion model based on flowline-averaged values of H and dH/dt
+    ! Bed roughness nudging model based on flowline-averaged values of H and dH/dt
     C%bednudge_H_dHdt_flowline_t_scale                       = bednudge_H_dHdt_flowline_t_scale_config
     C%bednudge_H_dHdt_flowline_dH0                           = bednudge_H_dHdt_flowline_dH0_config
     C%bednudge_H_dHdt_flowline_dHdt0                         = bednudge_H_dHdt_flowline_dHdt0_config
@@ -3896,15 +3830,11 @@ CONTAINS
     INQUIRE( FILE = namelist_filename, EXIST = ex)
     IF (.NOT. ex) CALL crash('namelist file ' // TRIM( namelist_filename) // ' could not be found!')
 
-
-    ! NOTE: disabled until the config file code has been refactored to accomodate optional vs. required config parameters!
-
     ! Check if all the variables appearing in the config file "config_filename" are valid
-    !CALL check_if_all_config_variables_are_valid( config_filename, namelist_filename, all_are_valid)
-    !
+    CALL check_if_all_config_variables_are_valid( config_filename, namelist_filename, all_are_valid)
+
     ! Check if all the expected config variables appear in the config file "config_filename"
     !CALL check_if_all_expected_config_variables_are_present( config_filename, namelist_filename, all_are_present)
-    all_are_valid = .true.
     all_are_present = .true.
 
     ! If not all is well, crash
