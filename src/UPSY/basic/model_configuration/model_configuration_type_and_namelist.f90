@@ -915,7 +915,7 @@ module model_configuration_type_and_namelist
     real(dp)            :: uniform_BMB_ROI_config                       = 0._dp
 
     ! "parameterised"
-    real(dp)            :: BMB_Favier2019_gamma_config                  = 99.32E-5
+    real(dp)            :: BMB_Favier2019_gamma_config                  = 3.025E-3
     real(dp)            :: BMB_Holland_Cmelt_config                     = 34.8_dp                          ! equivalent to 8.19e-5 if it was an exchange velocity gamma
 
     ! "laddie_py"
@@ -975,7 +975,7 @@ module model_configuration_type_and_namelist
 
     ! Turbulent heat exchange
     character(len=1024) :: choice_laddie_gamma_config                   = 'uniform'                        ! Choose option turbulent heat exchange. Options: 'uniform', 'Jenkins1991'
-    real(dp)            :: uniform_laddie_gamma_T_config                = 1.8E-4_dp                        ! [] 'uniform': gamma_T parameter. gamma_S = gamma_T/35
+    real(dp)            :: uniform_laddie_gamma_T_config                = 1.8E-3_dp                        ! [] 'uniform': gamma_T parameter. gamma_S = gamma_T/35
 
     ! Drag coefficients
     real(dp)            :: laddie_drag_coefficient_top_config           = 1.1E-3_dp                        ! [] Drag coefficient Cd_top in friction velocity

@@ -10,7 +10,7 @@ module transects_main
   use region_types, only: type_model_region
   use mesh_types, only: type_mesh
   use ice_model_types, only: type_ice_model
-  use transect_types, only: atype_transect, type_transect
+  use transect_types, only: type_transect
   use string_module, only: separate_strings_by_double_vertical_bars
   use netcdf_io_main
   use netcdf, only: NF90_UNLIMITED
@@ -23,13 +23,13 @@ module transects_main
   use mpi_distributed_memory, only: gather_to_all
   use interpolation, only: linint_points
   use netcdf, only: NF90_DOUBLE
-  USE BMB_model_types, ONLY: type_BMB_model
+  use BMB_model_types, ONLY: type_BMB_model
 
   implicit none
 
   private
 
-  public :: initialise_transects, write_to_transect_netcdf_output_files, initialise_transect_waypoints_from_file, calc_transect_vertices_from_waypoints
+  public :: initialise_transects, write_to_transect_netcdf_output_files
 
 contains
 
@@ -256,6 +256,7 @@ contains
       waypoints(1,:) = [mesh%xmin/2._dp,mesh%ymin/4._dp]
       waypoints(2,:) = [mesh%xmax/2._dp,mesh%ymin/4._dp]
 
+
     ! == Thule idealised ==
     ! =====================
 
@@ -296,12 +297,11 @@ contains
       allocate(waypoints(2,2))
       waypoints(1,:) = [-150000.0_dp,0._dp]
       waypoints(2,:) = [-150000.0_dp,-740000.0_dp]
-  
+
     case('HalbraneD')
       allocate(waypoints(2,2))
       waypoints(1,:) = [150000.0_dp,0._dp]
       waypoints(2,:) = [150000.0_dp,-740000.0_dp]
-
 
     ! == Realistic ==
     ! ===============
@@ -543,7 +543,7 @@ contains
     !< Generate transect vertices spaced dx apart along waypoints
 
     ! In/output variables:
-    class(atype_transect),    intent(inout) :: transect
+    type(type_transect),      intent(inout) :: transect
     real(dp), dimension(:,:), intent(in   ) :: waypoints
     real(dp),                 intent(in   ) :: dx
 
@@ -748,6 +748,32 @@ contains
     call add_attribute_char( filename, ncid, transect%nc%id_var_dw_dz_3D, 'long_name', '3-D zz strain rate')
     call add_attribute_char( filename, ncid, transect%nc%id_var_dw_dz_3D, 'units'    , 'yr^-1')
 
+
+    call create_variable(  filename, ncid, 'du_dy_3D', NF90_DOUBLE, [n, z, t], transect%nc%id_var_du_dy_3D)
+    call add_attribute_char( filename, ncid, transect%nc%id_var_du_dy_3D, 'long_name', '3-D xy strain rate')
+    call add_attribute_char( filename, ncid, transect%nc%id_var_du_dy_3D, 'units'    , 'yr^-1')
+
+    call create_variable(  filename, ncid, 'dw_dy_3D', NF90_DOUBLE, [n, z, t], transect%nc%id_var_dw_dy_3D)
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dw_dy_3D, 'long_name', '3-D zy strain rate')
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dw_dy_3D, 'units'    , 'yr^-1')
+
+    call create_variable(  filename, ncid, 'dv_dz_3D', NF90_DOUBLE, [n, z, t], transect%nc%id_var_dv_dz_3D)
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dv_dz_3D, 'long_name', '3-D yz strain rate')
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dv_dz_3D, 'units'    , 'yr^-1')
+
+    call create_variable(  filename, ncid, 'du_dz_3D', NF90_DOUBLE, [n, z, t], transect%nc%id_var_du_dz_3D)
+    call add_attribute_char( filename, ncid, transect%nc%id_var_du_dz_3D, 'long_name', '3-D xz strain rate')
+    call add_attribute_char( filename, ncid, transect%nc%id_var_du_dz_3D, 'units'    , 'yr^-1')
+
+    call create_variable(  filename, ncid, 'dv_dx_3D', NF90_DOUBLE, [n, z, t], transect%nc%id_var_dv_dx_3D)
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dv_dx_3D, 'long_name', '3-D yx strain rate')
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dv_dx_3D, 'units'    , 'yr^-1')
+
+    call create_variable(  filename, ncid, 'dw_dx_3D', NF90_DOUBLE, [n, z, t], transect%nc%id_var_dw_dx_3D)
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dw_dx_3D, 'long_name', '3-D zx strain rate')
+    call add_attribute_char( filename, ncid, transect%nc%id_var_dw_dx_3D, 'units'    , 'yr^-1')
+
+
     call create_variable(  filename, ncid, 'BMB', NF90_DOUBLE, [n, t], transect%nc%id_var_basal_mass_balance)
     call add_attribute_char( filename, ncid, transect%nc%id_var_basal_mass_balance, 'long_name', 'Basal mass balance')
     call add_attribute_char( filename, ncid, transect%nc%id_var_basal_mass_balance, 'units'    , 'm yr^-1')
@@ -839,6 +865,12 @@ contains
     real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdu_dx_partial
     real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdv_dy_partial
     real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdw_dz_partial
+    real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdu_dy_partial
+    real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdv_dx_partial
+    real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdw_dx_partial
+    real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdu_dz_partial
+    real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdv_dz_partial
+    real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tdw_dy_partial
     ! real(dp), dimension(transect%vi1:transect%vi2,C%nz) :: tage_partial
     real(dp)                                            :: ice_mass_flux
     real(dp), dimension(C%nz)                           :: u_ort_prof
@@ -873,6 +905,12 @@ contains
     call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%du_dx_3D, tdu_dx_partial,  'trilin')
     call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%dv_dy_3D, tdv_dy_partial,  'trilin')
     call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%dw_dz_3D, tdw_dz_partial,  'trilin')
+    call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%du_dy_3D, tdu_dy_partial,  'trilin')
+    call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%dv_dx_3D, tdv_dx_partial,  'trilin')
+    call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%dw_dx_3D, tdw_dx_partial,  'trilin')
+    call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%du_dz_3D, tdu_dz_partial,  'trilin')
+    call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%dv_dz_3D, tdv_dz_partial,  'trilin')
+    call map_from_mesh_vertices_to_transect_3D(  mesh, transect, ice%dw_dy_3D, tdw_dy_partial,  'trilin')
 
     ! Calculate parallel/orthogonal velocity components
     do k = 1, transect%nz
@@ -915,6 +953,12 @@ contains
     call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'du_dx_3D', tdu_dx_partial)
     call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'dv_dy_3D', tdv_dy_partial)
     call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'dw_dz_3D', tdw_dz_partial)
+    call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'du_dy_3D', tdu_dy_partial)
+    call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'dv_dx_3D', tdv_dx_partial)
+    call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'dw_dx_3D', tdw_dx_partial)
+    call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'du_dz_3D', tdu_dz_partial)
+    call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'dv_dz_3D', tdv_dz_partial)
+    call write_to_field_multopt_transect_dp_3D( transect, filename, ncid, 'dw_dy_3D', tdw_dy_partial)
 
     call write_to_field_multopt_dp_0D( filename, ncid, 'ice_mass_flux', ice_mass_flux)
     call write_to_field_multopt_dp_0D( filename, ncid, 'grounding_line_distance_from_start', GL_dist_from_start)

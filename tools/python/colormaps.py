@@ -23,8 +23,8 @@ def get_cmap(varname):
 
     elif varname == 'BMB_v2':
         #Create BMB colormap
-        vmax = 200
-        vmin = -10
+        vmax = 10
+        vmin = -25
         linthresh = .3
         linscale = .25
         fracpos = (np.log10(vmax/linthresh)+linscale)/(np.log10(vmax/linthresh)+np.log10(-(vmin/linthresh))+2*linscale)
@@ -74,15 +74,15 @@ def get_cmap(varname):
         
     elif varname == 'Hi':
         cmap = copy(plt.get_cmap('cmo.ice'))
-        norm = mpl.colors.Normalize(vmin=0,vmax=3000,clip=True)
+        norm = mpl.colors.Normalize(vmin=0,vmax=1000,clip=True)
 
-    elif varname == 'dHi':
+    elif varname == 'dHi_dt':
         colors1 = plt.get_cmap('afmhot')(np.linspace(0,1,128))
         colors2 = plt.get_cmap('bone_r')(np.linspace(0,1,128))
         colors = np.vstack((colors1,colors2))
         cmap = mpl.colors.LinearSegmentedColormap.from_list('my_colormap', colors, 256)
         cmap = copy(plt.get_cmap('cmo.tarn'))
-        norm = mpl.colors.Normalize(vmin=-1000,vmax=1000,clip=True)
+        norm = mpl.colors.Normalize(vmin=-2,vmax=2,clip=True)
 
     elif varname == 'Hib':
         cmap = copy(plt.get_cmap('GnBu_r'))
@@ -121,9 +121,9 @@ def get_cmap(varname):
         cmap = copy(plt.get_cmap('cmo.speed'))
         norm = mpl.colors.Normalize(vmin=0,vmax=0.5,clip=True)
 
-    elif varname in ['uabs_surf', 'uabs_vav', 'bed_roughness_nudge_H_u_target_velocity']:
-        cmap = copy(plt.get_cmap('turbo'))
-        norm = mpl.colors.Normalize(vmin=0,vmax=2000,clip=True)
+    elif varname in ['uabs_surf', 'uabs_vav', 'bed_roughness_nudge_H_u_target_velocity','u_surf', 'v_surf']:
+        cmap = copy(plt.get_cmap('cmo.speed'))
+        norm = mpl.colors.Normalize(vmin=-1000,vmax=1000,clip=True)
         #norm = mpl.colors.LogNorm(vmin=1.,vmax=4000,clip=True)
 
     elif varname == 'mask_SGD':

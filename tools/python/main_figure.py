@@ -100,7 +100,6 @@ class Figure(object):
                 if not field.Timeframe.got_gl:
                     field.Timeframe.get_gl()
                 field.ax.plot(field.Timeframe.gl[0,:],field.Timeframe.gl[1,:],c='k',lw=.5)
-
             field.ax.set_xlim([field.xmin+dxmin,field.xmax-dxmax])
             field.ax.set_ylim([field.ymin+dymin,field.ymax-dymax])
             field.ax.set_aspect(1)
