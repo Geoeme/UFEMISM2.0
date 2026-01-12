@@ -79,7 +79,6 @@ contains
       end do
     end if
 
-
     ! if so specified, remove thin floating ice
     if (C%choice_calving_law == 'threshold_thickness_FRONT') then
       do vi = mesh%vi1, mesh%vi2
@@ -88,7 +87,8 @@ contains
         end if
       end do
     end if
-  
+
+
     ! DENK DROM
     if (C%remove_ice_absent_at_PD) then
       do vi = mesh%vi1, mesh%vi2

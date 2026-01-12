@@ -214,7 +214,7 @@ contains
     ! Local variables:
     character(len=1024), parameter                :: routine_name = 'calc_mask_ROI'
     character(len=256)                            :: all_names_ROI, name_ROI
-    integer                                       :: vi, vj, ci, i, i_ROI
+    integer                                       :: vi, vj, ci, i
     real(dp), dimension(:,:  ), allocatable       :: poly_ROI
     real(dp), dimension(2)                        :: point
 
@@ -228,7 +228,6 @@ contains
     end if
 
     all_names_ROI = C%choice_regions_of_interest
-    i_ROI = 0
 
     do while (.true.)
 
@@ -256,10 +255,9 @@ contains
           ! No region requested: don't need to do anything
           exit
         case ('PineIsland','Thwaites','Amery','RiiserLarsen','SipleCoast', 'LarsenC', &
-              'TransMounts','DotsonCrosson', 'Franka_WAIS', 'Dotson_channel','Wilkes', &
-              'Antarctic_Peninsula', 'Institute', &                                           ! Antarctica
-              'Narsarsuaq','Nuuk','Jakobshavn','NGIS','Qaanaaq', &                            ! Greenland
-              'Patagonia', &                                                                  ! Patagonia
+              'TransMounts','DotsonCrosson', 'Franka_WAIS', 'Dotson_channel','Wilkes', 'Institute', &                 ! Antarctica
+              'Narsarsuaq','Nuuk','Jakobshavn','NGIS','Qaanaaq', &                                                    ! Greenland
+              'Patagonia', &                                                                                          ! Patagonia
               'CalvMIP_quarter')                                                              ! Idealised
           ! List of known regions of interest: these pass the test
         case default
@@ -338,8 +336,6 @@ contains
               call calc_polygon_Dotson_channel( poly_ROI)
             case ('Wilkes')
               call calc_polygon_Wilkes_basins( poly_ROI)  
-            case ('Antarctic_Peninsula')
-              call calc_polygon_Antarctic_Peninsula( poly_ROI)
             case ('Institute')
               call calc_polygon_Institute_basin( poly_ROI)    
             case default
@@ -352,13 +348,12 @@ contains
       end select
 
       ! Check for each grid point whether it is located within the polygon of the ROI
-      i_ROI = i_ROI+1
       do vi = mesh%vi1, mesh%vi2
         do ci = 1, mesh%nC(vi)
             vj = mesh%C( vi,ci)
             point = mesh%V( vj,:) ! Just to make sure it's in the right format
             if (is_in_polygon(poly_ROI, point)) then
-              ice%mask_ROI(vi) = i_ROI
+              ice%mask_ROI(vi) = .true.
             end if
         end do
       end do ! do vi = mesh%vi1, mesh%vi2
@@ -367,7 +362,6 @@ contains
       deallocate( poly_ROI)
 
     end do
-    ice%nROI = i_ROI ! keep track of how many ROIs we actually have in the mask
 
     ! Finalise routine path
     call finalise_routine( routine_name)
@@ -430,8 +424,8 @@ contains
         ! Prevent ice growth in the Ellesmere Island part of the Greenland domain
 
         call calc_mask_noice_remove_Ellesmere( mesh, ice%mask_noice)
-
-      case ('Thule')
+      
+       case ('Thule')
         ! Prevent ice growth in the Thule area
         do vi = mesh%vi1, mesh%vi2
           if (NORM2( mesh%V( vi,:)) > 750E3_dp) then
@@ -503,7 +497,7 @@ contains
     call init_routine( routine_name)
 
     select case (C%choice_laddie_SGD)
-      case ('none', 'read_transects')
+      case ('none')
         ! No SGD: don't need to do anything
       case ('idealised')
         call calc_mask_SGD_idealised(mesh, ice)

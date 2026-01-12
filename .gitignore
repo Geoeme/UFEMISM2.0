@@ -63,4 +63,52 @@ automated_testing/integrated_tests/idealised/Berends2023_nudging/experiment_I/in
 automated_testing/integrated_tests/idealised/Berends2023_nudging/experiment_II/input_data/*.nc
 
 # Ignore linting mods
+linting_mods/
 linting_mods/*
+<<<<<<< Updated upstream
+UFEenv/
+UFenv/
+=======
+>>>>>>> Stashed changes
+myenv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+<<<<<<< Updated upstream
+*.ipynb
+tools/python/ipynb/
+tools/python/sort/
+
+# Ignore outputs
+results_202*
+automated_testing/integrated_tests/idealised/Thule/result/
+automated_testing/integrated_tests/idealised/Thule/spinup2_/
+
+# Ignore plotting/large python outputs for now
+=======
+myenv/
+UFEenv/
+UFenv/
+
+# Ignore outputs
+results_202*
+automated_testing/integrated_tests/idealised/Thule/result
+/Users/McQua002/Desktop/UFEMISM.nosync/automated_testing/integrated_tests/idealised/Thule/spinup2_/
+
+# Ignore ploting outputs for now 
+>>>>>>> Stashed changes
+tools/python/Tests/
+tools/python/Lads/
+tools/python/Quads/
+tools/python/ipynb/
+<<<<<<< Updated upstream
+tools/python/
+=======
+/tools/python
+/automated_testing/integrated_tests/idealised/Thule/spinup2_
+*.f90
+src/UFEMISM/ice_dynamics/utilities/masks_mod.f90
+>>>>>>> Stashed changes

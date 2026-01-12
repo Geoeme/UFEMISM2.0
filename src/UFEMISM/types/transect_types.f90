@@ -36,8 +36,14 @@ module transect_types
     integer :: id_var_u_par_3D
     integer :: id_var_u_ort_3D
     integer :: id_var_du_dx_3D
+    integer :: id_var_dv_dx_3D
+    integer :: id_var_dw_dx_3D
     integer :: id_var_dv_dy_3D
+    integer :: id_var_du_dy_3D
+    integer :: id_var_dw_dy_3D
     integer :: id_var_dw_dz_3D
+    integer :: id_var_du_dz_3D
+    integer :: id_var_dv_dz_3D
 
     integer :: id_var_ice_mass_flux
     integer :: id_var_GL_dist_from_start
@@ -48,6 +54,7 @@ module transect_types
     integer :: id_var_CF_Hi_eff_from_end
     integer :: id_var_basal_mass_balance
 
+    
   end type type_transect_netcdf
 
   type, abstract :: atype_transect

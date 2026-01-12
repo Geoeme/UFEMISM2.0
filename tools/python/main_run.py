@@ -55,7 +55,7 @@ class Run(object):
         ds = xr.open_dataset(f'{self.directory}/scalar_output_ANT_00001.nc')
 
         #Prepare figure
-        fig = plt.figure()
+        fig = plt.figure(figsize=(7, 6))
 
         ax = fig.add_subplot(121)
         ax.plot(ds.time,ds.ice_volume,label='ice volume [msle]')
@@ -69,7 +69,7 @@ class Run(object):
         ax.plot(ds.time,ds.margin_ocean_flux,label='Margin [Gt/yr]')
         ax.plot(ds.time,ds.SMB_total+ds.BMB_total+ds.LMB_total+ds.margin_ocean_flux,c='k',label='Total [Gt/yr]')
         ax.legend()
-
+        plt.tight_layout()
         #Save figure
         figname = f'{self.directory}/figures/scalars.pdf'
         plt.savefig(figname)
