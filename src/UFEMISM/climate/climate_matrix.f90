@@ -22,8 +22,6 @@ module climate_matrix
   use SMB_IMAU_ITM, only: type_SMB_model_IMAU_ITM
   use climate_model_utilities                                , only: allocate_climate_snapshot, read_climate_snapshot, adapt_precip_CC, adapt_precip_Roe, get_insolation_at_time
   use assertions_basic, only: assert
-  use allocate_dist_shared_mod, only: allocate_dist_shared
-  use deallocate_dist_shared_mod, only: deallocate_dist_shared
 
  implicit none
 
@@ -746,9 +744,10 @@ contains
     ! Local variables:
     character(LEN=256), parameter                       :: routine_name = 'initialise_matrix_calc_absorbed_insolation'
     integer                                             :: vi,m,i
-    type(type_ice_model)                                :: ice_dummy
-    type(type_climate_model)                            :: climate_dummy
-    type(type_SMB_model)                                :: SMB_dummy
+    type(type_ice_model)      , target                  :: ice_dummy
+    type(type_climate_model)  , target                  :: climate_dummy
+    type(type_SMB_model)      , target                  :: SMB_dummy
+    type(type_grid)           , target                  :: grid_dummy
     character(LEN=256)                                  :: choice_SMB_IMAUITM_init_firn_dummy
 
     ! Add routine to path
@@ -815,10 +814,8 @@ contains
 
     ! SMB
     ! ===
-    call SMB_dummy%IMAUITM%init( mesh, ice, region_name)
-
-    call allocate_dist_shared( SMB_dummy%SMB, SMB_dummy%wSMB, mesh%pai_V%n_nih)
-    SMB_dummy%SMB( mesh%pai_V%i1_nih: mesh%pai_V%i2_nih) => SMB_dummy%SMB
+    call SMB_dummy%IMAUITM%allocate  ( SMB_dummy%IMAUITM%ct_allocate( 'SMB_IMAU_ITM_dummy', region_name, mesh))
+    call SMB_dummy%IMAUITM%initialise( SMB_dummy%IMAUITM%ct_initialise( ice_dummy))
 
     ! Initialisation choice
     if     (region_name == 'NAM') then
@@ -840,7 +837,7 @@ contains
     ! Run the SMB model for 10 years for this particular climate
     ! (experimentally determined to be long enough to converge)
     do i = 1, 10
-      call SMB_dummy%IMAUITM%run( mesh, ice_dummy, climate_dummy)
+      call SMB_dummy%IMAUITM%run( SMB_dummy%IMAUITM%ct_run( C%start_time_of_run, ice_dummy, climate_dummy, grid_dummy))
     end do
 
     ! Calculate yearly total absorbed insolation
@@ -852,7 +849,7 @@ contains
     end do
 
     ! Clean up after yourself
-    call deallocate_dist_shared( SMB_dummy%SMB, SMB_dummy%wSMB)
+    call SMB_dummy%IMAUITM%deallocate
 
     ! Finalise routine path
     call finalise_routine( routine_name)

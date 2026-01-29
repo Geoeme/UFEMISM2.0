@@ -19,7 +19,6 @@ module predictor_corrector_scheme
   use subgrid_grounded_fractions_main, only: calc_grounded_fractions
   use conservation_of_momentum_main, only: solve_stress_balance
   use subgrid_ice_margin, only: calc_effective_thickness
-  !use assertions_basic
 
   implicit none
 
@@ -130,7 +129,7 @@ contains
         region%ice%pc%dHi_dt_Hi_n_u_n - (region%ice%pc%zeta_t / 2._dp) * region%ice%pc%dHi_dt_Hi_nm1_u_nm1)
 
       ! if so desired, modify the predicted ice thickness field based on user-defined settings
-      !call alter_ice_thickness( region%mesh, region%ice, region%ice%Hi_prev, region%ice%pc%Hi_star_np1, region%refgeo_PD, region%time)
+      call alter_ice_thickness( region%mesh, region%ice, region%ice%Hi_prev, region%ice%pc%Hi_star_np1, region%refgeo_PD, region%time)
 
       ! Adjust the predicted dHi_dt to compensate for thickness modifications
       ! This is just Robinson et al., 2020, Eq 30 above rearranged to retrieve
@@ -216,7 +215,7 @@ contains
       region%ice%dHi_dt_raw = (region%ice%pc%Hi_np1 - region%ice%Hi_prev) / region%ice%pc%dt_np1
 
       ! if so desired, modify the corrected ice thickness field based on user-defined settings
-      !call alter_ice_thickness( region%mesh, region%ice, region%ice%Hi_prev, region%ice%pc%Hi_np1, region%refgeo_PD, region%time)
+      call alter_ice_thickness( region%mesh, region%ice, region%ice%Hi_prev, region%ice%pc%Hi_np1, region%refgeo_PD, region%time)
 
       ! Adjust the predicted dHi_dt to compensate for thickness modifications
       ! This is just Robinson et al., 2020, Eq 31 above rearranged to retrieve
@@ -290,9 +289,6 @@ contains
 
     ! == Final quantities
     ! ===================
-
-    ! Apply any user-defined ice thickness modifications to the final ice thickness
-    call alter_ice_thickness( region%mesh, region%ice, region%ice%Hi_prev, region%ice%pc%Hi_np1, region%refgeo_PD, region%time)
 
     ! Set next modelled ice thickness
     region%ice%t_Hi_next = region%ice%t_Hi_prev + region%ice%pc%dt_np1
