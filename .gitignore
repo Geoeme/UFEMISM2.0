@@ -68,3 +68,5 @@ automated_testing/integrated_tests/idealised/Berends2023_nudging/experiment_II/i
 
 # Ignore linting mods
 linting_mods/*
+
+automated_testing/integrated_tests/idealised/Thule
